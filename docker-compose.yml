@@ -1,0 +1,28 @@
+version: '3'
+services:
+  latex_processor:
+    build: ./
+    command: rails s -b 0.0.0.0
+    entrypoint: ./entrypoint.sh
+    volumes:
+      - ./:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://postgres:password@db:5432/master_db
+      RAILS_ENV: development
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: master_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+volumes:
+  pgdata:
+  
