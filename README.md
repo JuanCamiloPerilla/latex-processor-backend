@@ -16,11 +16,12 @@ que realiza la reescritura en los siguientes pasos:
   Convertir la expresión en tokens tiene dos objetivos. 
   
   a. Reemplazar la sintaxis en latex por caracteres simples que puedan proveer una representación visual simple en forma de string
-  para poder imprimirla con facilidad. Esto se logra con gsub https://apidock.com/ruby/String/gsub
-  b. Crear un arreglo de tokens que funcionará como entrada para el algoritmo shunting yard. El arreglo es creado a partir
-  de la nueva expresión con scan https://apidock.com/ruby/String/scan
+  para poder imprimirla con facilidad. Esto se logra con [gsub](https://apidock.com/ruby/String/gsub)
   
-2. Aplica el algoritmo shunting yard https://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm/ para reescribir el arreglo de tokens,
+  b. Crear un arreglo de tokens que funcionará como entrada para el algoritmo shunting yard. El arreglo es creado a partir
+  de la nueva expresión con [scan](https://apidock.com/ruby/String/scan)
+  
+2. Aplica el algoritmo [shunting yard](https://mathcenter.oxford.emory.edu/site/cs171/shuntingYardAlgorithm/) para reescribir el arreglo de tokens,
 inicialmente representado en notación infija, a una representación en notación postfija equivalente.
 
  ```ruby
@@ -32,7 +33,7 @@ inicialmente representado en notación infija, a una representación en notació
 Este paso tiene el objetivo de crear una estructura que represente con claridad la jerarquía de los operadores sin necesidad de utilizar paréntesis.
 Esta condición facilita enormemente la construcción de un arbol.
 
-3. Se construye un AST (Arbol de Sintaxis Abstracta) https://en.wikipedia.org/wiki/Abstract_syntax_tree a partir de la expresión en notación postfija.
+3. Se construye un AST ([Arbol de Sintaxis Abstracta](https://en.wikipedia.org/wiki/Abstract_syntax_tree)) a partir de la expresión en notación postfija.
 Para esta aplicación en particular, este arbol va a tener las siguientes características:
   a. Cada nodo va a ser o bien un operador o bien un operando.
   b. Si es un operando, será un nodo terminal (hoja) y no tendrá nodos hijos (ramas)
