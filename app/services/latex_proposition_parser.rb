@@ -12,7 +12,7 @@ class LatexPropositionParser
 
   def initialize(input_latex, precedence = nil)
     @input_latex = input_latex
-    @precedence = precedence ? precedence.reverse.each_with_index.to_h : PRESEDENCE
+    @precedence = precedence ? precedence.reverse.each_with_index.to_h : PRECEDENCE
   end
 
   def parse
@@ -42,7 +42,7 @@ class LatexPropositionParser
         output << token
       elsif OPERATORS.include?(token)
         while !stack.empty? && OPERATORS.include?(stack.last) &&
-              @precedence[token] <= @precedence[stack.last]
+              @precedence[token] < @precedence[stack.last]
           output << stack.pop
         end
         stack << token
@@ -52,7 +52,7 @@ class LatexPropositionParser
         until stack.empty? || stack.last == "("
           output << stack.pop
         end
-        stack.pop # elimina el "("
+        stack.pop # deletes "("
       end
     end
 
@@ -60,7 +60,7 @@ class LatexPropositionParser
     output
   end
 
-  # Simple Node for the tree structure
+
   Node = Struct.new(:value, :left, :right)
 
   def build_ast(rpn)
@@ -83,7 +83,7 @@ class LatexPropositionParser
   end
 
   def to_latex(node)
-    return node.value if node.left.nil? && node.right.nil?
+    return node.value if is_operand?(node)
 
     if node.value == "¬"
       "\\neg #{wrap_if_needed(node.right)}"
@@ -95,17 +95,21 @@ class LatexPropositionParser
         "↔" => "\\leftrightarrow"
       }
 
-      left = wrap_if_needed(node.left)
-      right = wrap_if_needed(node.right)
+      left = resolve_branch(node.left)
+      right = resolve_branch(node.right)
       "(#{left} #{op_map[node.value]} #{right})"
     end
   end
 
-  def wrap_if_needed(node)
-    if node.left.nil? && node.right.nil?
+  def resolve_branch(node)
+    if is_operand?(node)
       node.value
     else
       to_latex(node)
     end
+  end
+
+  def is_operand?(node)
+    node.left.nil? && node.right.nil?
   end
 end
