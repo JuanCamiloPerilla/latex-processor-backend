@@ -13,53 +13,21 @@ class LatexPropositionParser
   def initialize(input_latex, precedence = nil)
     @input_latex = input_latex
     @precedence = precedence ? precedence.reverse.each_with_index.to_h : PRECEDENCE
+    @expression_builder = Utils::PostfixExpressionBuilder.new(input_latex, @precedence)
   end
 
   def parse
-    tokens = tokenize(@input_latex)
-    output_queue = shunting_yard(tokens)
-    ast = build_ast(output_queue)
-    to_latex(ast)
+    @expression_builder.build
+    postfix_expression = @expression_builder.postfix_expression
+    # Build the AST from the postfix expression
+    # and convert it to LaTeX format.
+    ast = build_ast(postfix_expression)
+    result = to_latex(ast)
+
+    { latex: result, steps: @expression_builder.rewriting_steps }
   end
 
   private
-
-  def tokenize(input)
-    input.gsub("\\neg", "¬")
-         .gsub("\\lor", "∨")
-         .gsub("\\land", "∧")
-         .gsub("\\rightarrow", "→")
-         .gsub("\\leftrightarrow", "↔")
-         .scan(/¬|∧|∨|→|↔|\(|\)|[a-z]/)
-  end
-
-  def shunting_yard(tokens)
-    output = []
-    stack = []
-
-    tokens.each do |token|
-      if token.match?(/[a-z]/)
-        output << token
-      elsif OPERATORS.include?(token)
-        while !stack.empty? && OPERATORS.include?(stack.last) &&
-              @precedence[token] < @precedence[stack.last]
-          output << stack.pop
-        end
-        stack << token
-      elsif token == "("
-        stack << token
-      elsif token == ")"
-        until stack.empty? || stack.last == "("
-          output << stack.pop
-        end
-        stack.pop # deletes "("
-      end
-    end
-
-    output.concat(stack.reverse)
-    output
-  end
-
 
   Node = Struct.new(:value, :left, :right)
 
@@ -86,7 +54,8 @@ class LatexPropositionParser
     return node.value if is_operand?(node)
 
     if node.value == "¬"
-      "\\neg #{wrap_if_needed(node.right)}"
+      right = resolve_branch(node.right)
+      "\\neg (#{right})"
     else
       op_map = {
         "∧" => "\\land",
