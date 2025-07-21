@@ -1,5 +1,12 @@
 # Conversor a formula bien formada (backend)
 
+Por:
+- David Felipe Lancheros Ramires (dlancherosr@unal.edu.co)
+- Nelson Sadid Arias Mercado (neariasm@unal.edu.co)
+- Juan Camilo Perilla Jaramillo (jperillaj@unal.edu.co)
+
+# Explicación
+
 Este proyecto es una API construida en Ruby on Rails que expone un servicio que convierte cualquier fórmula lógica
 escrita en LaTex en su fórmula bien formada (fbf) equivalente y entrega el resultado al front end: https://github.com/JuanCamiloPerilla/latex-processor-frontend
 y al lista de pasos tomados para poder mostrarlos al usuario.
