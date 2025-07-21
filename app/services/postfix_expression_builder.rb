@@ -1,8 +1,7 @@
-class Utils::PostfixExpressionBuilder
+class PostfixExpressionBuilder
   # This class converts a logical expression in LaTeX format to postfix notation (Reverse Polish Notation).
   # It uses the Shunting Yard algorithm to handle operator precedence and parentheses.
 
-  attr_reader :input_latex, :postfix_expression, :rewriting_steps
   # Default operator precedence (highest number = highest priority)
   # 
   DEFAULT_PRECEDENCES = {
@@ -17,23 +16,15 @@ class Utils::PostfixExpressionBuilder
 
   RewritingStep = Struct.new(:input_token, :type, :stack, :output_queue, :remaining_input, :action, keyword_init: true)
 
-  def initialize(latex_input, precedences = nil)
-    @latex_input = latex_input
-    @precedences = precedences || DEFAULT_PRECEDENCES
-    @postfix_expression = []
-    @rewriting_steps = []
-  end
-
-  def build
-    shunting_yard_output = run_shunting_yard()
-    @postfix_expression = shunting_yard_output[:output]
-    @rewriting_steps = shunting_yard_output[:rewriting_steps]
+  def self.build(latex_input, precedences = DEFAULT_PRECEDENCES)
+    shunting_yard_output = run_shunting_yard(latex_input, precedences)
+    { postfix_expression: shunting_yard_output[:output], rewriting_steps: shunting_yard_output[:rewriting_steps] }
   end
 
   private
 
-  def tokenize_latex
-    @latex_input.gsub("\\neg", "¬")
+  def self.tokenize_latex(latex_input)
+    latex_input.gsub("\\neg", "¬")
          .gsub("\\lor", "∨")
          .gsub("\\land", "∧")
          .gsub("\\rightarrow", "→")
@@ -41,7 +32,7 @@ class Utils::PostfixExpressionBuilder
          .scan(/¬|∧|∨|→|↔|\(|\)|[a-z]/)
   end
 
-  def run_shunting_yard
+  def self.run_shunting_yard(latex_input, precedences)
     # This method implements the Shunting Yard algorithm to convert infix expressions to postfix notation.
     # It uses a stack to hold operators and outputs the final postfix expression.
     output = []
@@ -54,7 +45,7 @@ class Utils::PostfixExpressionBuilder
     # Example tokens: ["p", "∨", "q", "∧", "¬", "r", "(", "s", "→", "t", ")"]
     # The algorithm handles operator precedence and parentheses correctly.
     # The output will be in postfix notation, e.g., ["p", "q", "¬", "r", "s", "t", "→", "∧", "
-    tokens = tokenize_latex()
+    tokens = tokenize_latex(latex_input)
 
 
     rewriting_steps << RewritingStep.new(
@@ -101,7 +92,7 @@ class Utils::PostfixExpressionBuilder
       # Handle binary operators
       elsif OPERATORS.include?(token)
         while !stack.empty? && OPERATORS.include?(stack.last) &&
-              @precedences[token] < @precedences[stack.last]
+              precedences[token] < precedences[stack.last]
           # Pop operators from the stack to the output queue based on precedence
           operator = stack.pop
           output << operator

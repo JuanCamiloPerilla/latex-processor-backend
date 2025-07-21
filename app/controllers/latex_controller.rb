@@ -8,6 +8,6 @@ class LatexController < ApplicationController
     latex_result = parser.parse
     # latex_result = "(p \\lor (q \\land \\neg r))"
 
-    render json: { latex_result: latex_result.fetch(:latex, ""), steps: latex_result.fetch(:steps, []) }
+    render json: { latex_result: latex_result.fetch(:latex, ""), steps: latex_result.fetch(:steps, []), ast_steps: latex_result.fetch(:ast_steps, []) }
   end
 end

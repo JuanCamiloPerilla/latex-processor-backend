@@ -13,18 +13,18 @@ class LatexPropositionParser
   def initialize(input_latex, precedence = nil)
     @input_latex = input_latex
     @precedence = precedence ? precedence.reverse.each_with_index.to_h : PRECEDENCE
-    @expression_builder = Utils::PostfixExpressionBuilder.new(input_latex, @precedence)
   end
 
   def parse
-    @expression_builder.build
-    postfix_expression = @expression_builder.postfix_expression
+    postfix_builder_result = PostfixExpressionBuilder.build(@input_latex, @precedence)
+    postfix_to_ast_result = PostfixToAst.build_ast(postfix_builder_result[:postfix_expression])
+
     # Build the AST from the postfix expression
     # and convert it to LaTeX format.
-    ast = build_ast(postfix_expression)
-    result = to_latex(ast)
+    #ast = build_ast(postfix_expression)
+    result = to_latex(postfix_to_ast_result[:ast])
 
-    { latex: result, steps: @expression_builder.rewriting_steps }
+    { latex: result, steps: postfix_builder_result[:rewriting_steps], ast_steps: postfix_to_ast_result[:rewriting_steps] }
   end
 
   private
