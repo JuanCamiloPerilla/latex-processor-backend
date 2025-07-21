@@ -66,6 +66,8 @@ Además, la posibilidad de que el usuario escoja las precedencias de los operado
 
 # Manual de usuario
 
+La aplicación puede usarse en el siguiente enlace: https://latex-processor-frontend.onrender.com/
+
 La aplicación cuenta con una caja de texto donde se debe ingresar la fórmula lógica en sintaxis de latex. Debajo hay un panel que muestra la fórmula renderizada con símbolos de lates.
 Bajo la vista del latex renderizado hay una tabla que permite asignar manualmente las precedencias de los operadores.
 
